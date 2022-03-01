@@ -39,7 +39,8 @@ if (theme == "light" || theme == "dark") {
 let captchaInput;
 
 // Making the Socket io the connection
-const socket = io.connect("http://localhost:4000");
+// const socket = io.connect("http://localhost:4000"); // Development
+const socket = io.connect("https://noor-web-scraper.herokuapp.com"); // Production
 
 scrapeBtn.addEventListener("click", scrape);
 themeToggleBtn.addEventListener("click", themeToggle);

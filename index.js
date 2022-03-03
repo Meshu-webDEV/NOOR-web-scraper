@@ -19,7 +19,7 @@ const server = app.listen(process.env.PORT || 4000, () => {
 });
 
 app.use(express.static("public"));
-app.use(morgan("dev"));
+// app.use(morgan("dev")); Development
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));

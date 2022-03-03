@@ -1,11 +1,16 @@
 // Server imports =========
+require("dotenv").config();
 const express = require("express");
 const socket = require("socket.io");
+const morgan = require("morgan");
+const database = require("monk").default(process.env.MONGO_URI);
 const scrape = require("./scrape");
 const router = require("./routes/routes");
+
 // ========================
 
 const path = require("path");
+const { resolve } = require("path");
 
 // App
 const app = express();
@@ -14,6 +19,7 @@ const server = app.listen(process.env.PORT || 4000, () => {
 });
 
 app.use(express.static("public"));
+app.use(morgan("dev"));
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
@@ -53,5 +59,20 @@ io.on("connection", (socket) => {
         console.log("socket event error");
         console.log(err);
       });
+  });
+
+  socket.on("disconnect", async () => {
+    // TODO: call monk to delete screenshot entry if any
+    try {
+      const screenshots = database.get("screenshot");
+      await screenshots.remove({
+        "session-id": socket.id,
+      });
+      console.log(socket.id);
+      console.log("disconnected");
+      return resolve();
+    } catch (error) {
+      return reject("error removing screenshot from mongodb: ", error);
+    }
   });
 });

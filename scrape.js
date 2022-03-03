@@ -4,6 +4,7 @@ console.clear();
 const puppeteer = require("puppeteer");
 const path = require("path");
 const fs = require("fs");
+const database = require("monk").default(process.env.MONGO_URI);
 // ========================
 
 // Global status of the script
@@ -95,14 +96,16 @@ async function LaunchChromium(sessionId) {
               await image
                 .screenshot({
                   path: "images/" + sessionId + ".png",
+                  encoding: "base64",
                 })
                 .catch((err) => {
                   log("Couldn't scrape the captcha, Error: ", err);
                   reject(err);
                 })
-                .then(async (success) => {
-                  console.log(success);
+                .then(async (screenshot) => {
                   log("Successfully scraped the captcha ✅");
+                  await saveScreenshot(screenshot, sessionId);
+                  log("Successfully saved the captcha ✅");
                   log("Closing the Chromium instance...");
                   await browser
                     .close()
@@ -210,6 +213,22 @@ function log(msg) {
   let line = "[" + formattedDatetime + "]" + ": -- " + msg;
   logArray.push(line);
   console.log(line);
+}
+
+async function saveScreenshot(screenshot, sessionId) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const screenshots = database.get("screenshot");
+      await screenshots.insert({
+        "session-id": sessionId,
+        "base64-image": `data:image/png;base64,${screenshot}`,
+      });
+      return resolve();
+    } catch (error) {
+      console.log("error saving screenshot to mongodb: ", error);
+      return reject(error);
+    }
+  });
 }
 
 module.exports = {

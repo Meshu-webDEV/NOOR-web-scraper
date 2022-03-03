@@ -39,8 +39,8 @@ if (theme == "light" || theme == "dark") {
 let captchaInput;
 
 // Making the Socket io the connection
-// const socket = io.connect("http://localhost:4000"); // Development
-const socket = io.connect("https://noor-web-scraper.herokuapp.com"); // Production
+const socket = io.connect("http://localhost:4000"); // Development
+// const socket = io.connect("https://noor-web-scraper.herokuapp.com"); // Production
 
 scrapeBtn.addEventListener("click", scrape);
 themeToggleBtn.addEventListener("click", themeToggle);
@@ -154,15 +154,25 @@ function themeToggle() {
 }
 
 async function fetchAndAppend(id) {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     try {
-      fetch("http://localhost:4000/api/image/" + id).then((response) => {
-        response.blob().then((image) => {
-          captchaImg.setAttribute("src", URL.createObjectURL(image));
-        });
-      });
-      resolve();
-    } catch (error) {}
+      const response = await fetch(
+        `https://noor-web-scraper.herokuapp.com/api/image/${id}`
+      );
+      const captcha = await response.json(); // Production
+
+      // const response = await fetch(`http://localhost:4000/api/image/${id}`);
+      // const captcha = await response.json(); // Development
+
+      captchaImg.setAttribute("src", captcha["base64-image"]);
+
+      return resolve();
+    } catch (error) {
+      alert(
+        "There was an error fetching the captcha. Please refresh and try again."
+      );
+      return reject();
+    }
   });
 }
 

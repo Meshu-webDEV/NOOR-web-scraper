@@ -39,8 +39,8 @@ if (theme == "light" || theme == "dark") {
 let captchaInput;
 
 // Making the Socket io the connection
-const socket = io.connect("http://localhost:4000"); // Development
-// const socket = io.connect("https://noor-web-scraper.herokuapp.com"); // Production
+// const socket = io.connect("http://localhost:4000"); // Development
+const socket = io.connect("https://noor-scraper.com"); // Production
 
 scrapeBtn.addEventListener("click", scrape);
 themeToggleBtn.addEventListener("click", themeToggle);
@@ -156,9 +156,7 @@ function themeToggle() {
 async function fetchAndAppend(id) {
   return new Promise(async (resolve, reject) => {
     try {
-      const response = await fetch(
-        `https://noor-web-scraper.herokuapp.com/api/image/${id}`
-      );
+      const response = await fetch(`https://noor-scraper.com/api/image/${id}`);
       const captcha = await response.json(); // Production
 
       // const response = await fetch(`http://localhost:4000/api/image/${id}`);

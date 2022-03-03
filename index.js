@@ -2,7 +2,7 @@
 require("dotenv").config();
 const express = require("express");
 const socket = require("socket.io");
-const morgan = require("morgan");
+// const morgan = require("morgan"); // Development
 const database = require("monk").default(process.env.MONGO_URI);
 const scrape = require("./scrape");
 const router = require("./routes/routes");
